@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Core.DTO
 {
-    public record RRegisterRequest(
+    public record RegisterRequest(
         string? Email,
         string? Password,
         string? PersonName,
