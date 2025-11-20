@@ -38,11 +38,13 @@ namespace eCommerce.API.Controllers
             return Ok(registrationResponse);
         }
 
-       /// <summary>
-       /// Authenticates a user using provided login credentials.
-       /// </summary>
-       /// <param name="loginRequest">The login credentials. Cannot be null.</param>
-       public async Task<IActionResult> Login(LoginRequest loginRequest)
+        /// <summary>
+        /// Authenticates a user using provided login credentials.
+        /// </summary>
+        /// <param name="loginRequest">The login credentials. Cannot be null.</param>
+        [Route("Login")]
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginRequest loginRequest)
         {
             if (loginRequest == null)
                 return BadRequest("LoginRequest cannot be null");
