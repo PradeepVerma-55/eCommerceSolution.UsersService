@@ -1,4 +1,5 @@
-﻿using eCommerce.Core.DTO;
+﻿using AutoMapper;
+using eCommerce.Core.DTO;
 using eCommerce.Core.Entities;
 using eCommerce.Core.RepositoryContracts;
 using eCommerce.Core.ServiceContracts;
@@ -13,10 +14,12 @@ namespace eCommerce.Core.Services
     internal class UserService : IUserService
     {
         private readonly IUsersRepository _repository;
+        private readonly IMapper _mapper;
 
-        public UserService(IUsersRepository repository)
+        public UserService(IUsersRepository repository, IMapper mapper)
         {
             this._repository = repository;
+            this._mapper = mapper;
         }
 
         public async Task<AuthenticationResponse?> Login(LoginRequest loginRequest)
@@ -24,25 +27,18 @@ namespace eCommerce.Core.Services
             var user = await _repository.GetUserByEmailAndPassword(loginRequest.Email, loginRequest.Password);
             if (user == null)
                 return null;
-            return new AuthenticationResponse(user.UserId,user.Email,user.PersonName,user.Gender,"Token",true);
+            return _mapper.Map<AuthenticationResponse>(user) with { Token="token", success = true};
         }
 
         public async Task<AuthenticationResponse?> Register(RegisterRequest registerRequest)
         {
             // Create a new Application user from the requests
 
-            ApplicationUser applicationUser = new ApplicationUser()
-            {
-                 PersonName = registerRequest.PersonName,
-                  Email= registerRequest.Email,
-                  Password = registerRequest.Password,
-                  Gender  =  registerRequest.Gender.ToString(),
-            };
-
-           ApplicationUser? registeredUser = await _repository.AddUser(applicationUser);
+            ApplicationUser applicationUser = _mapper.Map<ApplicationUser>(registerRequest);
+            ApplicationUser? registeredUser = await _repository.AddUser(applicationUser);
             if (registeredUser == null)
                 return null;
-            return new AuthenticationResponse(registeredUser.UserId, registeredUser.PersonName, registeredUser.Gender, registeredUser.Email, "token", true);
+            return _mapper.Map<AuthenticationResponse>(registeredUser) with { Token = "token", success = true };
 
 
 

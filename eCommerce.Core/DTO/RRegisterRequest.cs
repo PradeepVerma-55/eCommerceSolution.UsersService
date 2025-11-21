@@ -5,5 +5,11 @@
         string? Password,
         string? PersonName,
         GenderOptions Gender
-        );
+        )
+    {
+        public RegisterRequest() : this(default, default, default, default)
+        {
+
+        }
+    }
 }

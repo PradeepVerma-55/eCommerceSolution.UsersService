@@ -1,6 +1,7 @@
-using eCommerce.Infrastructure;
-using eCommerce.Core;
 using eCommerce.API.Middlewares;
+using eCommerce.Core;
+using eCommerce.Core.Mappers;
+using eCommerce.Infrastructure;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,9 @@ builder.Services.AddControllers().AddJsonOptions
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+// Add AutoMapper   
+builder.Services.AddAutoMapper(typeof(ApplicationUserMappingProfile).Assembly);
 
 var app = builder.Build();
 
