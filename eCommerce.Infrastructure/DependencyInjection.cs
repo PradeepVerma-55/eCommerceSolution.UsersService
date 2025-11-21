@@ -1,4 +1,5 @@
 ﻿using eCommerce.Core.RepositoryContracts;
+using eCommerce.Infrastructure.DbContext;
 using eCommerce.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,9 +10,14 @@ namespace eCommerce.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            // Add infrastructure services here
+            
+            services.AddScoped<DapperDbContext>();
 
-            services.AddSingleton<IUsersRepository, UsersRepository>();
+            // Add infrastructure services here
+            // Changed from Singleton to Scoped to avoid consuming a scoped service from a singleton
+            services.AddScoped<IUsersRepository, UsersRepository>();
+         
+
             return services;
         }
 
