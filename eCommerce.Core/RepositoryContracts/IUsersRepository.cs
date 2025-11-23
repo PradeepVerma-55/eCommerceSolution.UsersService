@@ -18,6 +18,6 @@ namespace eCommerce.Core.RepositoryContracts
         /// <param name="Email"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<ApplicationUser> GetUserByEmailAndPassword(string? Email, string? password);
+        Task<ApplicationUser?> GetUserByEmailAndPassword(string? Email, string? password);
     }
 }

@@ -15,10 +15,13 @@ namespace eCommerce.Infrastructure.Repositories
         }
         public async Task<ApplicationUser?> AddUser(ApplicationUser user)
         {
-            // Generate a new UserId    
-            user.UserId = Guid.NewGuid();
+            // Generate a new UserId if not already provided
+            if (user.UserId == Guid.Empty)
+            {
+                user.UserId = Guid.NewGuid();
+            }
             const string query = @"
-            INSERT INTO users (userid, email, password, personname, gender)
+            INSERT INTO public.users (""UserId"", ""Email"", ""Password"", ""PersonName"", ""Gender"")
             VALUES (@UserId, @Email, @Password, @PersonName, @Gender); ";
 
             int rowAffected = await _dbContext.DbConnection.ExecuteAsync(query, user);
@@ -27,16 +30,16 @@ namespace eCommerce.Infrastructure.Repositories
             return user;
         }
 
-        public async Task<ApplicationUser> GetUserByEmailAndPassword(string? email, string? password)
+        public async Task<ApplicationUser?> GetUserByEmailAndPassword(string? email, string? password)
         {
-            return new ApplicationUser
-            {
-                UserId = Guid.NewGuid(),
-                Email = email,
-                Password = password,
-                PersonName = "Person Name",
-                Gender = GenderOptions.Male.ToString()
-            };
+            // Sql query to get user by email and password
+            const string query = @"
+            SELECT * FROM public.users
+            WHERE ""Email"" = @Email AND ""Password"" = @Password; ";
+
+            var user = await _dbContext.DbConnection.QuerySingleOrDefaultAsync<ApplicationUser>(query, new { Email = email, Password = password });
+            return user;
+
         }
     }
 }

@@ -51,7 +51,7 @@ namespace eCommerce.API.Controllers
             var loginResponse = await _userService.Login(loginRequest);
             if (loginResponse == null || loginResponse.success == false)
             {
-                return BadRequest("User login failed");
+                return Unauthorized("User login failed");
             }
             return Ok(loginResponse);
         }
