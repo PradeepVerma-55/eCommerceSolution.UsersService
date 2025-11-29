@@ -15,8 +15,10 @@ namespace eCommerce.Infrastructure.DbContext
 
         public DapperDbContext(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("PostgreSqlConnection")
+           string connectionStringTemplate = configuration.GetConnectionString("PostgreSqlConnection")!
                 ?? throw new InvalidOperationException("Connection string 'PostgreSqlConnection' not found.");
+            _connectionString = connectionStringTemplate.Replace("$POSTGRES_HOST", Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost")
+                                                         .Replace("$POSTGRES_PASSWORD", Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "admin");
         }
 
         // Return a new connection instance on each request (avoid sharing a single IDbConnection)

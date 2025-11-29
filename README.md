@@ -150,6 +150,104 @@ Troubleshooting
 - Connection failures — verify `PostgreSqlConnection` string, network, and that PostgreSQL allows connections from your host.
 - Validation not running — ensure `FluentValidation.AspNetCore` package is installed in `eeCommerce.API` and `AddFluentValidationAutoValidation()` is called in `Program.cs`.
 
+Docker and Containerization
+---------------------------
+This project already includes a Dockerfile at `eeCommerce.API/Dockerfile`. The instructions below show how to build and run an image using that Dockerfile and how to run the API together with PostgreSQL using Docker Compose.
+
+1) Build Docker image using the existing Dockerfile
+
+From the repository root run:
+
+    docker build -t eecommerce-users-api:latest -f eeCommerce.API/Dockerfile .
+
+2) Run the container (connect to an external Postgres)
+
+If you already have PostgreSQL running on the host, run the container and pass the connection string via environment variable. On Windows/Mac use `host.docker.internal` to reach the host-side Postgres from the container:
+
+    docker run -d --name users-api \
+      -p 8080:8080 \
+      -e ASPNETCORE_URLS="http://+:8080" \
+      -e ConnectionStrings__PostgreSqlConnection="Host=host.docker.internal;Port=5432;Username=postgres;Password=secret;Database=usersdb" \
+      eecommerce-users-api:latest
+
+On Linux replace `host.docker.internal` with the host IP or run Postgres as a container (recommended).
+
+3) Run API + Postgres together (recommended) using docker-compose
+
+Create a `docker-compose.yml` at the repository root (example):
+
+```yaml
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: usersdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: eeCommerce.API/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__PostgreSqlConnection: "Host=db;Port=5432;Username=postgres;Password=secret;Database=usersdb"
+    ports:
+      - "8080:8080"
+    restart: on-failure
+
+volumes:
+  db-data:
+```
+
+Then start both services:
+
+    docker compose up --build
+
+Open the API/Swagger at: http://localhost:8080/swagger
+
+4) Useful Docker commands
+
+- Stop & remove container:
+
+    docker stop users-api && docker rm users-api
+
+- View logs:
+
+    docker logs -f users-api
+    docker compose logs -f api
+
+- Exec shell into running container:
+
+    docker exec -it users-api /bin/sh
+
+- Tag & push image to registry:
+
+    docker tag eecommerce-users-api:latest <registry>/eecommerce-users-api:1.0.0
+    docker push <registry>/eecommerce-users-api:1.0.0
+
+5) Notes & best practices
+
+- Use environment variables or Docker secrets for DB credentials in production; avoid embedding secrets in images.
+- Secure Swagger UI and restrict CORS in production environments.
+- If your DB schema uses quoted mixed-case columns, ensure repository SQL matches (the repo currently uses quoted identifiers); prefer snake_case for new schemas.
+- Add health checks and readiness probes for production orchestration.
+
 Contributing
 ------------
 - Fork the repository and create a PR with a clear description.
