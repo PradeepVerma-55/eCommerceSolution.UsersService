@@ -8,7 +8,7 @@ namespace eCommerce.Core.Mappers
     {
         public ApplicationUserMappingProfile()
         {
-            // Define your object-object mapping configurations here
+            // Map ApplicationUser to AuthenticationResponse
             CreateMap<ApplicationUser, AuthenticationResponse>()
                 .ForMember(dest=> dest.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
@@ -16,6 +16,14 @@ namespace eCommerce.Core.Mappers
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src =>src.Gender))
                 .ForMember(dest => dest.Token, opt => opt.Ignore())
                 .ForMember(dest => dest.success, opt => opt.Ignore())
+                ;
+
+            // Map ApplicationUser to UserDTO
+            CreateMap<ApplicationUser, UserDTO>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PersonName, opt => opt.MapFrom(src => src.PersonName))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender ?? "NotSpecified"))
                 ;
         }
     }

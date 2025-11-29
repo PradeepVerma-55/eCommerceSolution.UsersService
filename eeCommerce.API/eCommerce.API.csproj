@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Program-BACKUP.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\eCommerce.Core\eCommerce.Core.csproj" />
     <ProjectReference Include="..\eCommerce.Infrastructure\eCommerce.Infrastructure.csproj" />
   </ItemGroup>

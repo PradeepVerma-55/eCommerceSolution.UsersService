@@ -29,5 +29,12 @@ namespace eCommerce.Core.ServiceContracts
         /// cref="AuthenticationResponse"/> object with details about the registration outcome, including any
         /// authentication tokens or status information.</returns>
         Task<AuthenticationResponse> Register(RegisterRequest registerRequest);
+
+        /// <summary>
+        /// Returns UserDTO object based on the given UserID
+        /// </summary>
+        /// <param name="userID">UserID to search</param>
+        /// <returns>UserDTO object based on the matching UserID</returns>
+        Task<UserDTO> GetUserByUserID(Guid userID);
     }
 }

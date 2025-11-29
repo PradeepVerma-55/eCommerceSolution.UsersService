@@ -7,74 +7,52 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register infrastructure and core services
+// Add services
 builder.Services.AddInfrastructure();
 builder.Services.AddCore();
-
-// Add controllers
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
-
-// Add AutoMapper
 builder.Services.AddAutoMapper(typeof(ApplicationUserMappingProfile).Assembly);
-
-// Add FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
-
-// Add API Explorer
 builder.Services.AddEndpointsApiExplorer();
-
-// Add Swagger with explicit configuration
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Title = "eCommerce Users API",
         Version = "v1",
-        Description = "API for managing eCommerce users and authentication"
+        Description = "API for managing eCommerce users"
     });
 });
 
-// Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policyBuilder =>
+    options.AddDefaultPolicy(policy =>
     {
-        policyBuilder.AllowAnyOrigin()
-                     .AllowAnyHeader()
-                     .AllowAnyMethod();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
 
-// Exception handling middleware
+// Configure middleware pipeline
 app.UseExceptionHandlingMiddleware();
-
-// Routing
 app.UseRouting();
-
-// CORS
 app.UseCors();
 
-// Swagger - always enabled
+// Always enable Swagger (for both Dev and Prod)
 app.UseSwagger();
-app.UseSwaggerUI(c =>
+app.UseSwaggerUI(options =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "eCommerce Users API v1");
-    c.RoutePrefix = string.Empty;  // Serve at root
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "eCommerce Users API v1");
+    options.RoutePrefix = string.Empty; // Root path
 });
 
-// Redirect root to Swagger if needed
-app.MapGet("/", () => Results.Redirect("/index.html")).ExcludeFromDescription();
-
-// Authorization
 app.UseAuthorization();
-
-// Map controllers
 app.MapControllers();
 
-// Run
 app.Run();
