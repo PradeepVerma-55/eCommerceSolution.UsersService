@@ -21,8 +21,10 @@ namespace eCommerce.API.Controllers
         [HttpGet("{userID}")]
         public async Task<IActionResult> GetUserByUserID(Guid userID)
         {
-            await Task.Delay(100);
-            throw new Exception("This is a exception for Poly retry testing purposes.");
+            //await Task.Delay(100);
+            //throw new Exception("This is a exception for Poly retry testing purposes.");
+
+           // await Task.Delay(10000); // Simulating long-running operation for testing timeout policy
 
             if (userID == Guid.Empty)
             {
